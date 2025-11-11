@@ -1,0 +1,7 @@
+pandas>=2.2
+SQLAlchemy>=2.0
+tabulate>=0.9
+streamlit>=1.37
+python-dotenv>=1.0
+openai>=1.52
+pytest>=8.0

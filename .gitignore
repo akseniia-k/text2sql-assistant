@@ -1,0 +1,30 @@
+# virtual environment
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# build/packaging
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# test & tool caches
+.cache/
+.coverage
+.tox/
+
+# notebooks
+.ipynb_checkpoints/
+
+# secrets / local settings
+.env
+
+# local databases
+data/*.sqlite
+data/*.db
