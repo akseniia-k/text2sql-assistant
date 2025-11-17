@@ -28,3 +28,13 @@ build/
 # local databases
 data/*.sqlite
 data/*.db
+
+# PyCharm project files
+.idea/
+
+# Python project ignores
+.venv/
+__pycache__/
+data/*.sqlite
+.env
+

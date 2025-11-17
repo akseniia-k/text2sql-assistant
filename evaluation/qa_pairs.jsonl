@@ -1,0 +1,10 @@
+{"question":"List the first 5 artist names.","sql":"SELECT Name FROM Artist ORDER BY Name ASC LIMIT 5;"}
+{"question":"Show each album with its artist name (first 5).","sql":"SELECT Album.Title AS AlbumTitle, Artist.Name AS ArtistName FROM Album JOIN Artist ON Album.ArtistId = Artist.ArtistId ORDER BY Album.Title ASC LIMIT 5;"}
+{"question":"How many albums does each artist have? Return top 10 by album count.","sql":"SELECT Artist.Name AS Artist, COUNT(Album.AlbumId) AS AlbumCount FROM Artist JOIN Album ON Artist.ArtistId = Album.ArtistId GROUP BY Artist.Name ORDER BY AlbumCount DESC, Artist ASC LIMIT 10;"}
+{"question":"Top 5 genres by number of tracks.","sql":"SELECT Genre.Name AS Genre, COUNT(Track.TrackId) AS TrackCount FROM Genre JOIN Track ON Genre.GenreId = Track.GenreId GROUP BY Genre.Name ORDER BY TrackCount DESC, Genre ASC LIMIT 5;"}
+{"question":"Total sales amount in 2010.","sql":"SELECT SUM(Invoice.Total) AS TotalSales FROM Invoice WHERE strftime('%Y', Invoice.InvoiceDate) = '2010';"}
+{"question":"Top 10 customers by lifetime spend.","sql":"SELECT Customer.CustomerId, Customer.FirstName || ' ' || Customer.LastName AS Customer, SUM(InvoiceLine.Quantity * InvoiceLine.UnitPrice) AS TotalSpent FROM Customer JOIN Invoice ON Customer.CustomerId = Invoice.CustomerId JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId GROUP BY Customer.CustomerId ORDER BY TotalSpent DESC, Customer ASC LIMIT 10;"}
+{"question":"Number of customers per country (top 10).","sql":"SELECT Customer.Country, COUNT(*) AS CustomerCount FROM Customer GROUP BY Customer.Country ORDER BY CustomerCount DESC, Customer.Country ASC LIMIT 10;"}
+{"question":"List the 5 most expensive tracks (by UnitPrice).","sql":"SELECT Name AS Track, UnitPrice FROM Track ORDER BY UnitPrice DESC, Name ASC LIMIT 5;"}
+{"question":"How many invoices are there in total?","sql":"SELECT COUNT(*) AS InvoiceCount FROM Invoice;"}
+{"question":"How many media types exist?","sql":"SELECT COUNT(*) AS MediaTypeCount FROM MediaType;"}
