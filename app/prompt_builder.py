@@ -15,9 +15,10 @@ You are an expert SQL generator.
 Follow these strict rules:
 - Dialect: **SQLite**
 - Only return a single SQL SELECT statement.
+- Table and column names are **case-sensitive**; use them exactly as shown in the schema.
 - Use ONLY the tables and columns listed in the schema below.
 - Always use explicit JOINs (no implicit joins).
-- Fully qualify columns (e.g., artists.Name).
+- Fully qualify columns (e.g., Artist.Name).
 - Never modify, create, or delete data (no INSERT/UPDATE/DELETE/ALTER).
 - If no LIMIT is specified, append LIMIT 1000.
 - Return **only** the SQL — no explanations, no markdown, no code fences.
@@ -29,70 +30,74 @@ Follow these strict rules:
 # ----------------------------
 
 def build_few_shots() -> str:
-    """Provide 4–6 progressive text→SQL examples for the model."""
+    """Provide 4–6 progressive text→SQL examples for the model (Chinook, CamelCase tables)."""
     examples = [
+        # 1) Single table select
         {
             "question": "List the first 5 artist names.",
-            "sql": "SELECT Name FROM artists ORDER BY Name LIMIT 5;"
+            "sql": "SELECT Name FROM Artist ORDER BY Name ASC LIMIT 5;"
         },
+        # 2) Simple join (Artist ↔ Album)
         {
-            "question": "Show each album with its artist name.",
+            "question": "Show each album with its artist name (first 5).",
             "sql": (
-                "SELECT albums.Title AS AlbumTitle, artists.Name AS ArtistName "
-                "FROM albums "
-                "JOIN artists ON albums.ArtistId = artists.ArtistId "
+                "SELECT Album.Title AS AlbumTitle, Artist.Name AS ArtistName "
+                "FROM Album "
+                "JOIN Artist ON Album.ArtistId = Artist.ArtistId "
+                "ORDER BY Album.Title ASC "
                 "LIMIT 5;"
             )
         },
+        # 3) Aggregation + GROUP BY (albums per artist)
         {
-            "question": "Find the number of albums per artist (top 10).",
+            "question": "How many albums does each artist have? Return top 10 by album count.",
             "sql": (
-                "SELECT artists.Name, COUNT(albums.AlbumId) AS AlbumCount "
-                "FROM artists "
-                "JOIN albums ON artists.ArtistId = albums.ArtistId "
-                "GROUP BY artists.Name "
-                "ORDER BY AlbumCount DESC "
+                "SELECT Artist.Name AS Artist, COUNT(Album.AlbumId) AS AlbumCount "
+                "FROM Artist "
+                "JOIN Album ON Artist.ArtistId = Album.ArtistId "
+                "GROUP BY Artist.Name "
+                "ORDER BY AlbumCount DESC, Artist ASC "
                 "LIMIT 10;"
             )
         },
+        # 4) Top-N with ORDER BY/LIMIT (genres by track count)
         {
-            "question": "List the top 5 genres by total number of tracks.",
+            "question": "Top 5 genres by number of tracks.",
             "sql": (
-                "SELECT genres.Name AS Genre, COUNT(tracks.TrackId) AS TrackCount "
-                "FROM genres "
-                "JOIN tracks ON genres.GenreId = tracks.GenreId "
-                "GROUP BY genres.Name "
-                "ORDER BY TrackCount DESC "
+                "SELECT Genre.Name AS Genre, COUNT(Track.TrackId) AS TrackCount "
+                "FROM Genre "
+                "JOIN Track ON Genre.GenreId = Track.GenreId "
+                "GROUP BY Genre.Name "
+                "ORDER BY TrackCount DESC, Genre ASC "
                 "LIMIT 5;"
             )
         },
+        # 5) Date filter using Invoice
         {
-            "question": "Find total sales in 2010.",
+            "question": "Total sales amount in 2010.",
             "sql": (
-                "SELECT SUM(InvoiceTotal) AS TotalSales "
-                "FROM ( "
-                "SELECT invoices.Total AS InvoiceTotal "
-                "FROM invoices "
-                "WHERE strftime('%Y', invoices.InvoiceDate) = '2010' "
-                ");"
+                "SELECT SUM(Invoice.Total) AS TotalSales "
+                "FROM Invoice "
+                "WHERE strftime('%Y', Invoice.InvoiceDate) = '2010';"
             )
         },
+        # 6) Multi-join (Customer ↔ Invoice ↔ InvoiceLine ↔ Track)
         {
             "question": "Show the top 10 customers by total spend.",
             "sql": (
-                "SELECT customers.FirstName || ' ' || customers.LastName AS Customer, "
-                "SUM(invoice_items.Quantity * invoice_items.UnitPrice) AS TotalSpent "
-                "FROM customers "
-                "JOIN invoices ON customers.CustomerId = invoices.CustomerId "
-                "JOIN invoice_items ON invoices.InvoiceId = invoice_items.InvoiceId "
-                "GROUP BY customers.CustomerId "
-                "ORDER BY TotalSpent DESC "
+                "SELECT Customer.CustomerId, "
+                "Customer.FirstName || ' ' || Customer.LastName AS Customer, "
+                "SUM(InvoiceLine.Quantity * InvoiceLine.UnitPrice) AS TotalSpent "
+                "FROM Customer "
+                "JOIN Invoice ON Customer.CustomerId = Invoice.CustomerId "
+                "JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId "
+                "GROUP BY Customer.CustomerId "
+                "ORDER BY TotalSpent DESC, Customer ASC "
                 "LIMIT 10;"
             )
         },
     ]
 
-    # format examples nicely
     lines = ["### Examples"]
     for ex in examples:
         lines.append(f"\nUser: {ex['question']}\nSQL: {ex['sql']}")
