@@ -1,4 +1,3 @@
-# app/orchestrator.py
 """
 End-to-end CLI pipeline for the Text-to-SQL assistant.
 

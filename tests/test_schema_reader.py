@@ -1,4 +1,3 @@
-# tests/test_schema_reader.py
 from app.schema_reader import get_schema_text, read_schema
 from sqlalchemy import create_engine
 
