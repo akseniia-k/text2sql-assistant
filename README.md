@@ -1,216 +1,206 @@
-﻿🚀 Text-to-SQL Assistant
+﻿# 🚀 Text-to-SQL Assistant  
+*A natural-language interface for querying relational databases using LLM-generated SQL.*
 
-A natural-language interface for querying relational databases using LLM-generated SQL.
+![Main UI](images/ui_main.png)
 
-📖 Overview
+---
 
-Text-to-SQL Assistant lets users ask questions in natural language and automatically converts them into safe, validated SQLite SQL queries, returning results instantly.
+## 📖 Overview
 
-It aims to democratize access to data by enabling non-technical stakeholders to query databases without writing SQL. The assistant exposes SQL generation, validation, schema interpretation, and execution in a clean and transparent UI.
+**Text-to-SQL Assistant** enables users to ask questions in natural language and automatically converts them into safe, validated **SQLite SQL** queries with real-time results.
 
-This project is designed as a portfolio-ready, end-to-end data engineering + LLM system, with safe SQL generation, schema-aware prompting, evaluation, and a Streamlit interface.
+This system democratizes access to data by allowing anyone — technical or not — to query a database without writing SQL.
 
-🌟 Features
-✔️ Natural language → SQL
+It provides **full transparency**, showing:
+- Generated SQL  
+- Executed SQL  
+- Database schema  
+- Full LLM prompt  
+- Query results  
+- Configurable settings sidebar  
 
-Uses an LLM (OpenAI gpt-4o-mini by default) to translate English questions into SQL SELECT statements.
+This project is a **portfolio-grade, end-to-end LLM engineering system** covering data engineering, prompt engineering, safety, evaluation, and UI development.
 
-✔️ Automatic schema ingestion
+---
 
-Reads any SQLite database using SQLAlchemy reflection and injects the schema into the LLM prompt.
+# 🌟 Features
 
-✔️ SQL guardrails (safety)
+### ✔️ Natural language → SQL  
+Translates English questions into valid SQL using OpenAI models (`gpt-4o-mini`, `gpt-4.1`, etc.).
 
-Prevents dangerous operations like UPDATE, DELETE, DROP, and enforces:
+### ✔️ Automatic schema ingestion  
+Reads all tables, columns, and PK/FK relationships using SQLAlchemy reflection.
 
-SELECT-only
+### ✔️ SQL safety guardrails  
+- SELECT-only enforcement  
+- Denylist: UPDATE, DELETE, INSERT, DROP, ALTER…  
+- Auto-LIMIT if missing  
+- Single-statement enforcement  
+- Case-sensitive table/column validation  
 
-LIMIT added automatically
+### ✔️ Interactive Streamlit UI  
+- Question input  
+- Generated SQL  
+- Executed SQL after guard  
+- Download results as CSV  
+- Collapsible schema & prompt  
+- Model/temperature controls  
 
-Single-statement queries
+### ✔️ Fully transparent  
+Shows everything the model sees and generates.
 
-Case-sensitive table/column names
+---
 
-✔️ Debug visibility
+# 🧠 System Architecture
 
-The UI shows:
+User question  
+↓  
+schema_reader → auto-ingests DB schema  
+↓  
+prompt_builder → rules + schema + examples + question  
+↓  
+LLMClient → OpenAI model generates SQL  
+↓  
+sql_guard → SELECT-only, denylist, LIMIT, validation  
+↓  
+safe_execute → SQLAlchemy execution  
+↓  
+Results table (+ CSV)
 
-Generated SQL
+---
 
-Executed SQL (after guard)
+# 🖥️ Application UI
 
-Full prompt
+## 🖼️ Main Interface  
+![Main UI](images/ui_main.png)
 
-Parsed schema
+---
 
-✔️ Streamlit UI
+## 🔍 Example Query  
+![Query Example](images/query_example.png)
 
-Interactive, clean, and responsive:
+---
 
-Query input
+## 🗄️ Schema Viewer  
+![Schema View](images/schema_view.png)
 
-On-the-fly results
+---
 
-Downloadable CSV
+## 🧠 Full Prompt (Debug)  
+![Full Prompt](images/full_prompt.png)
 
-Expanders for schema & prompt
+---
 
-🧠 How It Works
-question → schema_reader → prompt_builder → LLM
-        → sql_guard → db_executor → results (+ CSV)
-                        ↘ eval logger
+## ⚙️ Settings Sidebar  
+![Settings Sidebar](images/settings_sidebar.png)
 
-1. Schema Reader
+---
 
-Reads tables, columns, PK/FK relationships using SQLAlchemy reflection.
+# 🗂️ Project Structure
 
-2. Prompt Builder
+text2sql-assistant/  
+├── app/  
+│   ├── __init__.py  
+│   ├── schema_reader.py       # Reflects DB schema → dict + markdown  
+│   ├── prompt_builder.py      # Builds full LLM prompt  
+│   ├── llm_client.py          # OpenAI client wrapper  
+│   ├── sql_guard.py           # SQL safety validation  
+│   ├── db.py                  # SQLite engine + safe_execute  
+│   ├── orchestrator.py        # CLI pipeline  
+│   └── ui_streamlit.py        # Streamlit frontend  
+│  
+├── data/  
+│   └── chinook.sqlite  
+│  
+├── evaluation/  
+│   ├── qa_pairs.jsonl  
+│   └── run_eval.py  
+│  
+├── tests/  
+│   ├── test_schema_reader.py  
+│   ├── test_prompt_builder.py  
+│   ├── test_sql_guard.py  
+│   └── test_pipeline.py  
+│  
+├── images/  
+│   ├── ui_main.png  
+│   ├── query_example.png  
+│   ├── schema_view.png  
+│   ├── full_prompt.png  
+│   └── settings_sidebar.png  
+│  
+├── requirements.txt  
+├── .env (ignored)  
+└── README.md
 
-Creates a structured system prompt:
+---
 
-Rules for SQLite
+# ⚙️ Installation & Setup
 
-Schema summary
-
-Few-shot examples
-
-User question
-
-3. LLM Client
-
-Calls OpenAI’s Chat Completions API with clean, deterministic settings (T=0).
-
-4. SQL Guard
-
-Validates and sanitizes LLM-generated SQL.
-
-5. Executor
-
-Runs the final SQL safely and returns results via Pandas.
-
-6. Streamlit UI
-
-Displays results, SQL, schema, and debugging info.
-
-🖥️ Example Query
-
-Below is a fully generated SQL pipeline example.
-
-The assistant responds with both:
-
-Generated SQL
-
-Executed SQL (after safety guardrail modifications)
-
-Tabular results
-
-🧱 Database Schema View
-
-The app exposes a transparent, LLM-ready database schema.
-
-🧩 Full Prompt (Debug)
-
-You can see the exact prompt given to the LLM for reproducibility and debugging.
-This includes rules, schema, and few-shot examples.
-
-📦 Project Structure
-text2sql-assistant/
-├─ app/
-│  ├─ schema_reader.py       # Auto-ingest DB schema
-│  ├─ prompt_builder.py      # System prompt + few-shot examples
-│  ├─ llm_client.py          # OpenAI client wrapper
-│  ├─ sql_guard.py           # SELECT-only & safety
-│  ├─ db.py                  # SQLite execution utils
-│  ├─ orchestrator.py        # CLI pipeline
-│  ├─ ui_streamlit.py        # Streamlit UI
-├─ data/
-│  └─ chinook.sqlite         # Example database
-├─ evaluation/
-│  ├─ qa_pairs.jsonl         # Gold labeled test set
-│  └─ run_eval.py            # Execution & exact-match metrics
-├─ tests/
-│  ├─ test_schema_reader.py
-│  ├─ test_sql_guard.py
-│  ├─ test_prompt_builder.py
-│  └─ test_pipeline.py
-└─ images/
-   ├─ ui_main.png
-   ├─ query_example.png
-   ├─ schema_view.png
-   ├─ full_prompt.png
-   └─ settings_sidebar.png
-
-⚙️ Installation & Setup
-1. Clone the repo
-git clone https://github.com/akseniia-k/text2sql-assistant.git
+1. **Clone the repo**
+```
+git clone https://github.com/YOUR_USERNAME/text2sql-assistant.git
 cd text2sql-assistant
+```
 
-2. Create environment
+2. **Create environment**
+```
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
+```
 
-3. Add OpenAI API Key
+3. **Add OpenAI API Key**
 
-Create a .env file in the project root:
-
+Create `.env`:
+```
 OPENAI_API_KEY=your_key_here
+```
 
-4. Run the UI
+4. **Run the UI**
+```
 streamlit run app/ui_streamlit.py
+```
 
-📊 Evaluation
+---
 
-You can measure:
+# 📊 Evaluation
 
-Execution success rate
+Run accuracy & execution tests:
+```
+python -m evaluation.run_eval --validate evaluation/qa_pairs.jsonl --db data/chinook.sqlite --sanity
+```
 
-Exact SQL match
+Metrics include:
+- Execution success rate  
+- Exact SQL match  
+- Result equivalence  
 
-Result equivalence
+---
 
-Run:
+# 🔐 SQL Safety
 
-python -m evaluation.run_eval --validate evaluation/qa_pairs.jsonl --sanity --db data/chinook.sqlite
+The SQL guard ensures:
+- SELECT-only queries  
+- No modification queries  
+- Auto LIMIT  
+- No stacked statements  
+- Schema-aware validation  
 
-🔒 SQL Safety
+If SQL fails validation, the model is prompted to repair it safely.
 
-This project includes a hardened guardrail system:
+---
 
-Denylist (UPDATE, DELETE, INSERT, ALTER, DROP, …)
+# 💡 Example Questions to Try
 
-SELECT-only validation
+- “Which artist has the most albums?”  
+- “List the 10 most expensive tracks.”  
+- “Show total sales by country.”  
+- “Which customers spent the most money?”  
+- “Top genres by number of tracks.”  
+- “Monthly sales totals for 2010.”  
 
-Automatic LIMIT
+---
 
-Single-statement enforcement
-
-If SQL is rejected, the model is asked to repair it via a secondary LLM prompt.
-
-🎯 Project Goals
-
-This project demonstrates real-world abilities in:
-
-✔️ LLM-powered data systems
-✔️ Prompt engineering
-✔️ SQL query generation & safety
-✔️ Streamlit UI development
-✔️ Testing & evaluation pipelines
-✔️ Clean architecture & modular Python design
-🧭 Future Enhancements
-
-Fine-tuned model using synthetic Text-to-SQL data
-
-Support for Postgres & MySQL
-
-User authentication
-
-Query history persistence
-
-Role-based query restrictions
-
-👩‍💻 Author
-
-Akseniia K.
-Data Science & AI Engineer
-LinkedIn: https://www.linkedin.com/in/akseniia-k/
+# 👩‍💻 Author
+Akseniia Konashenkova Data Scientist LinkedIn: www.linkedin.com/in/akseniia-konashenkova
