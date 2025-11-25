@@ -7,19 +7,19 @@
 
 ## 📖 Overview
 
-**Text-to-SQL Assistant** enables users to ask questions in natural language and automatically converts them into safe, validated **SQLite SQL** queries with real-time results.
+**Text-to-SQL Assistant** lets you ask questions in plain English and turns them into safe, validated **SQLite SQL** queries.
 
-This system democratizes access to data by allowing anyone — technical or not — to query a database without writing SQL.
+It’s designed so anyone with or without SQL experience can explore a database confidently.
 
-It provides **full transparency**, showing:
+You always see exactly what the model does, including:
 - Generated SQL  
 - Executed SQL  
 - Database schema  
 - Full LLM prompt  
 - Query results  
-- Configurable settings sidebar  
+- Adjustable settings
 
-This project is a **portfolio-grade, end-to-end LLM engineering system** covering data engineering, prompt engineering, safety, evaluation, and UI development.
+This is a complete, end-to-end project covering schema processing, prompt engineering, safety checks, evaluation, and UI development.
 
 ---
 
@@ -55,7 +55,7 @@ Shows everything the model sees and generates.
 
 User question  
 ↓  
-schema_reader → auto-ingests DB schema  
+schema_reader → reads DB schema
 ↓  
 prompt_builder → rules + schema + examples + question  
 ↓  
@@ -63,7 +63,7 @@ LLMClient → OpenAI model generates SQL
 ↓  
 sql_guard → SELECT-only, denylist, LIMIT, validation  
 ↓  
-safe_execute → SQLAlchemy execution  
+safe_execute → runs SQL via SQLAlchemy  
 ↓  
 Results table (+ CSV)
 
@@ -101,13 +101,13 @@ Results table (+ CSV)
 text2sql-assistant/  
 ├── app/  
 │   ├── __init__.py  
-│   ├── schema_reader.py       # Reflects DB schema → dict + markdown  
-│   ├── prompt_builder.py      # Builds full LLM prompt  
-│   ├── llm_client.py          # OpenAI client wrapper  
-│   ├── sql_guard.py           # SQL safety validation  
-│   ├── db.py                  # SQLite engine + safe_execute  
-│   ├── orchestrator.py        # CLI pipeline  
-│   └── ui_streamlit.py        # Streamlit frontend  
+│   ├── schema_reader.py       
+│   ├── prompt_builder.py      
+│   ├── llm_client.py            
+│   ├── sql_guard.py            
+│   ├── db.py                   
+│   ├── orchestrator.py         
+│   └── ui_streamlit.py         
 │  
 ├── data/  
 │   └── chinook.sqlite  
@@ -187,7 +187,7 @@ The SQL guard ensures:
 - No stacked statements  
 - Schema-aware validation  
 
-If SQL fails validation, the model is prompted to repair it safely.
+If SQL isn’t safe or valid, the system asks the model to fix it.
 
 ---
 
@@ -203,4 +203,6 @@ If SQL fails validation, the model is prompted to repair it safely.
 ---
 
 # 👩‍💻 Author
-Akseniia Konashenkova Data Scientist LinkedIn: www.linkedin.com/in/akseniia-konashenkova
+Akseniia Konashenkova - Data Scientist 
+
+LinkedIn: www.linkedin.com/in/akseniia-konashenkova
